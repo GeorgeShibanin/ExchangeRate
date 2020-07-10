@@ -1,2 +1,2 @@
 run:
-	gunicorn app:app -b localhost:5000
+	gunicorn -b localhost:5000 wsgi:app
