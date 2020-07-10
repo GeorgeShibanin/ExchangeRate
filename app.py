@@ -20,7 +20,7 @@ def get_exrate(id):
 
 def format_data(data):
     data = data.replace("\"", "")
-    return text
+    return data
 
 
 @lru_cache(maxsize=128)

@@ -1,2 +1,5 @@
 run:
-	gunicorn app:app -b localhost:5000
+	gunicorn -b localhost:5000 wsgi:app
+
+requirements:
+	pip install --user -r requirements.txt
