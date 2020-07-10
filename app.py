@@ -8,13 +8,18 @@ text = "TYPE ANOTHER CURRENCY, NO SUCH CURRENCY IN BASE"
 app = Flask(__name__)
 
 
+@app.route('/', methods=['GET'])
+def get_home():
+    return "Type any Currency"
+
+
 @app.route('/<string:id>', methods=['GET'])
 def get_exrate(id):
     return get_content(URL, id)
 
 
-def format_data(text):
-    text = text.replace("\"", "")
+def format_data(data):
+    data = data.replace("\"", "")
     return text
 
 
