@@ -1,11 +1,14 @@
-from flask import Flask, jsonify, make_response
+from flask import Flask, jsonify
+from flask_caching import Cache
 import requests
-from functools import lru_cache
 
-URL = 'https://api.ratesapi.io/api/latest'
+URL1 = 'https://api.ratesapi.io/api/latest'
+URL2 = 'https://api.exchangeratesapi.io/latest'
 text = "TYPE ANOTHER CURRENCY, NO SUCH CURRENCY IN BASE"
 
 app = Flask(__name__)
+
+cache = Cache(app, config={'CACHE_TYPE': 'simple'})
 
 
 @app.route('/', methods=['GET'])
@@ -15,7 +18,7 @@ def get_home():
 
 @app.route('/<string:id>', methods=['GET'])
 def get_exrate(id):
-    return get_content(URL, id)
+    return jsonify(get_content(URL1, id))
 
 
 def format_data(data):
@@ -23,14 +26,17 @@ def format_data(data):
     return data
 
 
-@lru_cache(maxsize=128)
 def get_content(html, name):
     if name != "latest":
         html = html + "?base=" + name
-    response = requests.get(html).text
-    if response == "{\"error\":\"Base \'"+name+"\' is not supported.\"}":
-        return text
-    return format_data(response)
+    response = cache.get(html)
+    if response is None:
+        response = requests.get(html)
+        if response.status_code == 400:
+            return text
+        response = response.json()
+        cache.add(html, response, 60*10)
+    return response
 
 
 if __name__ == '__main__':
