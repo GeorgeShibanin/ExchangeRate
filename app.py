@@ -11,29 +11,32 @@ app = Flask(__name__)
 cache = Cache(app, config={'CACHE_TYPE': 'simple'})
 
 
+@app.route('/<string:id>', methods=['GET'])
+def get_exrate(id):
+    return jsonify(get_content(id))
+
+
 @app.route('/', methods=['GET'])
 def get_home():
     return "Type any Currency"
 
 
-@app.route('/<string:id>', methods=['GET'])
-def get_exrate(id):
-    return jsonify(get_content(URL1, id))
-
-
-def format_data(data):
-    data = data.replace("\"", "")
-    return data
-
-
-def get_content(html, name):
+def format_url(html, name):
     if name != "latest":
         html = html + "?base=" + name
+    return html
+
+
+def get_content(name):
+    html = format_url(URL1, name)
     response = cache.get(html)
     if response is None:
         response = requests.get(html)
         if response.status_code == 400:
             return text
+        if response.status_code != 200:
+            html = format_url(URL2, name)
+            response = requests.get(html)
         response = response.json()
         cache.add(html, response, 60*10)
     return response
