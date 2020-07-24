@@ -13,7 +13,7 @@ cache = Cache(app, config={'CACHE_TYPE': 'simple'})
 
 @app.route('/<string:id>', methods=['GET'])
 def get_exrate(id):
-    return jsonify(get_content(id))
+    return get_content(id)
 
 
 @app.route('/', methods=['GET'])
